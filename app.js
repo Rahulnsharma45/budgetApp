@@ -58,6 +58,16 @@ var budgetController = (function() {
             return newItem;
         },
 
+        deleteItem: function(type, id) {
+            var ids, index;
+
+            var ids = data.allItems[type].map(function(current){
+                return current.id;
+            });
+
+            index = ids.indexOf(id);
+        },
+
         calculateBudget: function() {
             calculateTotal('exp');
             calculateTotal('inc');
@@ -128,8 +138,14 @@ var UIController = (function() {
 
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         },
-         clearFields: function() {
-             var fields, fieldsArr;
+
+        deleteListItem: function(selectorID) {
+            var el = document.getElementById(selectorID);
+            el.parentNode.removeChild(el);
+        },                                       
+
+        clearFields: function() {
+            var fields, fieldsArr;
             fields = document.querySelectorAll(DOMstrings.inputDescription + ',' + DOMstrings.inputValue);
 
             fieldsArr = Array.prototype.slice.call(fields);
@@ -139,9 +155,9 @@ var UIController = (function() {
             });
 
             fieldsArr[0].focus();
-         },
+        },
 
-         displayBudget: function(obj) {
+        displayBudget: function(obj) {
              
             document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
             document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
@@ -152,7 +168,7 @@ var UIController = (function() {
             } else {
                 document.querySelector(DOMstrings.percentageLabel).textContent = '----';
             }
-         },
+        },
 
         getDOMstrings: function() {
             return DOMstrings;
@@ -208,14 +224,20 @@ var controller = (function(budgetCtrl, UICtrl) {
     };
 
     var ctrlDeleteItem = function(event) {
-        var ItemID;
+        var itemID, splitID, type, ID;
 
-        ItemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
 
-        if (ItemID) {
+        if (itemID) {
 
+            splitID = itemID.split('-');
+            type = splitID[0];
+            ID = splitID[1];
 
+            budgetCtrl.deleteItem(type, ID);
+            UICtrl.deleteListItem(itemID);
 
+            updateBudget();
         }
 
     };
